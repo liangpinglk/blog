@@ -22,7 +22,7 @@ pip install supervisor
 ```shell
 echo_supervisord_conf > supervisor_sample.conf
 ```
-文件中都有详细的注释，然后我根据这个做了一个简单的demo测试，[github源码]()
+文件中都有详细的注释，然后我根据这个做了一个简单的demo测试，[github源码](https://github.com/liangpinglk/blog/tree/master/demo/supervisor)
 - 启动supervisor
 ```shell
 supervisord -c supervisor_demo.conf
