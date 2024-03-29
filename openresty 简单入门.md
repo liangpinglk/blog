@@ -1,22 +1,10 @@
-## openresty 简单入门
 openresty 有封装好的容器，我这里为了学习，自己拉了一个Ubuntu的基础镜像， 在此环境中，进行openresty的学习(如果不是在容器中进行学习开发的，记得有的命令会提示权限问题，记得使用root权限，命令前加sudo)。
 ``` bash
 docker run -v /home/lmf/Develop/lua_develop:/lua_develop --name lua_develop -p 81:80 --restart always -d ubuntu:20.04 /bin/sh -c "while true; do echo hello world; sleep 1; done"
 ```
-***
+
 **本文有关openresty的内容，皆是出自openresty官方文档，稍微有一点更改与补充，文中内容出处都标出了超链接，可以点击查看原文，以下所有代码在[这里](https://github.com/liangpinglk/openresty-practice)可以找到**
-## 目录
-<!-- TOC -->
-
-- [openresty 简单入门](#openresty-简单入门)
-- [目录](#目录)
-    - [安装](#安装)
-    - [Hello World](#hello-world)
-    - [基于openresty 的动态路由](#基于openresty-的动态路由)
-    - [在openresty中使用luarocks](#在openresty中使用luarocks)
-
-<!-- /TOC -->
-### 安装
+## 安装
 [OpenResty® Linux 包](https://openresty.org/cn/linux-packages.html)
 ``` bash
 # 安装需要的工具
@@ -31,7 +19,7 @@ echo "deb http://openresty.org/package/ubuntu $(lsb_release -sc) main" | tee /et
 apt update
 apt-get -y install openresty
 ```
-### Hello World
+## Hello World
 原文：[Hello World](https://openresty.org/cn/getting-started.html)
 - 创建开发目录(此后所有的命令执行都在work目录下)
 ``` bash
@@ -75,7 +63,7 @@ http {
     ```
 至此，我们就成功启动了第一个openresty 服务
 
-### 基于openresty 的动态路由
+## 基于openresty 的动态路由
 原文：[基于openresty 的动态路由](https://openresty.org/cn/dynamic-routing-based-on-redis.html)
 - 准备redis
 > 使用docker创建一个redis容器
@@ -169,7 +157,7 @@ http {
 curl --user-agent foo localhost
 curl --user-agent bar localhost
 ```
-### 在openresty中使用luarocks
+## 在openresty中使用luarocks
 > LuaRocks 是一个部署和管理 Lua 模块的系统。
 - 安装
     - luajit 环境变量
