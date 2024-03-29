@@ -37,7 +37,8 @@ Type=notify
 # the default is not to use systemd for cgroups because the delegate issues still
 # exists and systemd currently does not support the cgroup feature set required
 # for containers run by docker
-ExecStart=/usr/bin/dockerd # -H tcp://0.0.0.0:2375 -H unix://var/run/docker.sock
+ExecStart=/usr/bin/dockerd
+# -H tcp://0.0.0.0:2375 -H unix://var/run/docker.sock
 ExecReload=/bin/kill -s HUP $MAINPID
 # Having non-zero Limit*s causes performance problems due to accounting overhead
 # in the kernel. We recommend using cgroups to do container-local accounting.
