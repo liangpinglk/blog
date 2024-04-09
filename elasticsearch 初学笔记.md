@@ -1,5 +1,5 @@
-[toc]
 # 安装
+## 下载安装
 ```
 curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-8.6.0-darwin-x86_64.tar.gz
 curl https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-8.6.0-darwin-x86_64.tar.gz.sha512 | shasum -a 512 -c - 
@@ -30,6 +30,121 @@ cd elasticsearch-8.6.0/
 • On other nodes:
   ⁃ Start Elasticsearch with `bin/elasticsearch --enrollment-token <token>`, using the enrollment token that you generated.
 ```
+## docker 安装
+### install elasticsearch
+> 都是单机版，集群版等可以参考[官方文档](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html)
+- create network
+```shell
+docker network create elasti
+```
+- run docker container
+> 不限制内存，会直接飚满
+```shell
+docker run --name es01 --net elastic -p 9200:9200 -it -m 10GB  -d docker.elastic.co/elasticsearch/elasticsearch:8.13.2
+```
+- 查看日志
+```shell
+docker logs -f --tail=200 es01
+```
+成功后会显示如下日志
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Elasticsearch security features have been automatically configured!
+✅ Authentication is enabled and cluster connections are encrypted.
+
+ℹ️  Password for the elastic user (reset with `bin/elasticsearch-reset-password -u elastic`):
+  7U7EdEEZZmnlytolO6Ix
+
+ℹ️  HTTP CA certificate SHA-256 fingerprint:
+  8c21fbb086c634b70da6ed1759f855ee3c00e5f6a6e33c1832aaac223975cea3
+
+ℹ️  Configure Kibana to use this cluster:
+• Run Kibana and click the configuration link in the terminal when Kibana starts.
+• Copy the following enrollment token and paste it into Kibana in your browser (valid for the next 30 minutes):
+  eyJ2ZXIiOiI4LjEzLjIiLCJhZHIiOlsiMTcyLjMwLjAuMjo5MjAwIl0sImZnciI6IjhjMjFmYmIwODZjNjM0YjcwZGE2ZWQxNzU5Zjg1NWVlM2MwMGU1ZjZhNmUzM2MxODMyYWFhYzIyMzk3NWNlYTMiLCJrZXkiOiJyang3d1k0QlFGRlk3c2RXLW1oaTo3ZGMwSlRidFFyT2FkbDd5NVpQbTlBIn0=
+
+ℹ️ Configure other nodes to join this cluster:
+• Copy the following enrollment token and start new Elasticsearch nodes with `bin/elasticsearch --enrollment-token <token>` (valid for the next 30 minutes):
+  eyJ2ZXIiOiI4LjEzLjIiLCJhZHIiOlsiMTcyLjMwLjAuMjo5MjAwIl0sImZnciI6IjhjMjFmYmIwODZjNjM0YjcwZGE2ZWQxNzU5Zjg1NWVlM2MwMGU1ZjZhNmUzM2MxODMyYWFhYzIyMzk3NWNlYTMiLCJrZXkiOiJyRHg3d1k0QlFGRlk3c2RXLW1oaDpOU0FUeUdjT1FtS0lIdjFJa1g0Mm9BIn0=
+
+  If you're running in Docker, copy the enrollment token and run:
+  `docker run -e "ENROLLMENT_TOKEN=<token>" docker.elastic.co/elasticsearch/elasticsearch:8.13.2`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+- 访问es
+> 一般情况都会成功，有时候不成功，不知到为什么，第二天重试又可以了
+```shell
+export ELASTIC_PASSWORD="7U7EdEEZZmnlytolO6Ix"
+docker cp es01:/usr/share/elasticsearch/config/certs/http_ca.crt .
+curl --cacert http_ca.crt -u elastic:$ELASTIC_PASSWORD https://localhost:9200
+```
+```
+{
+  "name" : "a3fa0894976d",
+  "cluster_name" : "docker-cluster",
+  "cluster_uuid" : "AzNl2fw3RFySNo4_8UtRTw",
+  "version" : {
+    "number" : "8.13.2",
+    "build_flavor" : "default",
+    "build_type" : "docker",
+    "build_hash" : "16cc90cd2d08a3147ce02b07e50894bc060a4cbf",
+    "build_date" : "2024-04-05T14:45:26.420424304Z",
+    "build_snapshot" : false,
+    "lucene_version" : "9.10.0",
+    "minimum_wire_compatibility_version" : "7.17.0",
+    "minimum_index_compatibility_version" : "7.0.0"
+  },
+  "tagline" : "You Know, for Search"
+}
+```
+- 错误
+  - ERROR: Elasticsearch died while starting up, with exit code 78  
+    > 遇到这个错误是因为系统的 vm.max_map_count 值过小，默认是 65530
+    - 查看vm.max_map_count
+      ```shell
+      sysctl -a|grep vm.max_map_count
+      ``` 
+    - 设置vm.max_map_count,一般设置为默认值的4倍
+      ```shell
+      sudo sysctl -w vm.max_map_count=262144 
+      ```
+    - vm.max_map_count 是什么
+    > max_map_count文件包含限制一个进程可以拥有的VMA(虚拟内存区域)的数量。虚拟内存区域是一个连续的虚拟地址空间区域。在进程的生命周期中，每当程序尝试在内存中映射文件，链接到共享内存段，或者分配堆空间的时候，这些区域将被创建。调优这个值将限制进程可拥有VMA的数量。限制一个进程拥有VMA的总数可能导致应用程序出错，因为当进程达到了VMA上线但又只能释放少量的内存给其他的内核进程使用时，操作系统会抛出内存不足的错误。如果你的操作系统在NORMAL区域仅占用少量的内存，那么调低这个值可以帮助释放内存给内核用。
+- 重新为用户生成密码
+```
+docker exec -it es01 /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic
+```
+
+### install Kibana
+- run a Kibana container
+> Kibana是一个开源的数据分析与可视化平台，与Elasticsearch搜索引擎一起使用。
+
+```shell
+docker run --name kib01 --net elastic -p 5601:5601 -it -d docker.elastic.co/kibana/kibana:8.13.2
+```
+- 浏览器访问链接  
+http://192.168.1.149:5601/
+- 生成访问需要的token
+> 有时候不成功，多试几次就好了
+```shell
+docker exec -it es01 /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
+```
+- 输入token后，会让提供6位的验证码
+```
+docker exec -it kib01 bin/kibana-verification-code
+```
+- 验证码验证成功后，会让登陆elasticsearch,需要输入用户名和密码
+> 用户名和密码可以通过安装好es后输出的关键信息得知  
+<img src="picture/elasticsearch/es_welcome.png" alt="es welcome" width="50%"> 
+
+
+### 参考
+- [install with docker](https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html)
+- [Elasticsearch Container Stopped with Exit 78 state in Ubuntu 18.04](https://github.com/laradock/laradock/issues/1699)
+
+
+
+
 # 使用
 ## create index
 ```shell
