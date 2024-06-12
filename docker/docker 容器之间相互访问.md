@@ -9,4 +9,4 @@ docker network create custom-local-net
 docker run --name ng1 --network custom-local-net  -d nginx
 docker run --name ng2 --network custom-local-net  -d nginx
 ```
-<img src="picture/docker-network/image.png">
+<img src="../picture/docker-network/image.png">
