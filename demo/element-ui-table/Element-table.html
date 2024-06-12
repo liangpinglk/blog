@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- import CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"
+    />
+  </head>
+  <body>
+    <div id="app">
+      <el-table
+        ref="multipleTable"
+        :data="tableData"
+        tooltip-effect="dark"
+        style="width: 100%;"
+        @selection-change="handleSelectionChange"
+        @select="singleSelect"
+        @select-all="selectAll"
+      >
+        <el-table-column type="selection" width="55"> </el-table-column>
+        <el-table-column label="日期" width="120">
+          <template slot-scope="scope">{{ scope.row.date }}</template>
+        </el-table-column>
+        <el-table-column prop="name" label="姓名" width="120">
+        </el-table-column>
+        <el-table-column prop="address" label="地址" show-overflow-tooltip>
+        </el-table-column>
+      </el-table>
+      <div style="margin-top: 20px;">
+        <el-button @click="toggleSelection([test, tableData[2]])"
+          >切换第二、第三行的选中状态</el-button
+        >
+        <el-button @click="toggleSelection()">取消选择</el-button>
+      </div>
+      <div style="text-align: right;">
+        <el-pagination
+          @current-change="handleCurrentChange"
+          :current-page="currentPage"
+          :page-sizes="[7]"
+          :page-size="pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="total"
+        >
+        </el-pagination>
+      </div>
+    </div>
+  </body>
+  <!-- import Vue before Element -->
+  <script src="https://unpkg.com/vue/dist/vue.js"></script>
+  <!-- import JavaScript -->
+  <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+  <script>
+    new Vue({
+      el: "#app",
+      data: function () {
+        return {
+          pageSize: 7,
+          total: 14,
+          currentPage: 1,
+          selectedInfo: [],
+          test: {
+            date: "2016-05-02",
+            name: "王小虎",
+            address: "上海市普陀区金沙江路 1518 弄",
+          },
+          tableData: [],
+          tableData1: [
+            {
+              date: "2016-05-03",
+              name: "王小虎",
+              address: "上海市普陀区金沙江路 1518 弄",
+            },
+            {
+              date: "2016-05-02",
+              name: "王小虎",
+              address: "上海市普陀区金沙江路 1518 弄",
+            },
+            {
+              date: "2016-05-04",
+              name: "王小虎",
+              address: "上海市普陀区金沙江路 1518 弄",
+            },
+            {
+              date: "2016-05-01",
+              name: "王小虎",
+              address: "上海市普陀区金沙江路 1518 弄",
+            },
+            {
+              date: "2016-05-08",
+              name: "王小虎",
+              address: "上海市普陀区金沙江路 1518 弄",
+            },
+            {
+              date: "2016-05-06",
+              name: "王小虎",
+              address: "上海市普陀区金沙江路 1518 弄",
+            },
+            {
+              date: "2016-05-07",
+              name: "王小虎",
+              address: "上海市普陀区金沙江路 1518 弄",
+            },
+          ],
+          tableData2: [
+            {
+              date: "2016-05-03",
+              name: "张三",
+              address: "上海市普陀区金沙江路 1518 弄",
+            },
+            {
+              date: "2016-05-02",
+              name: "张三",
+              address: "上海市普陀区金沙江路 1518 弄",
+            },
+            {
+              date: "2016-05-04",
+              name: "张三",
+              address: "上海市普陀区金沙江路 1518 弄",
+            },
+            {
+              date: "2016-05-01",
+              name: "张三",
+              address: "上海市普陀区金沙江路 1518 弄",
+            },
+            {
+              date: "2016-05-08",
+              name: "张三",
+              address: "上海市普陀区金沙江路 1518 弄",
+            },
+            {
+              date: "2016-05-06",
+              name: "张三",
+              address: "上海市普陀区金沙江路 1518 弄",
+            },
+            {
+              date: "2016-05-07",
+              name: "张三",
+              address: "上海市普陀区金沙江路 1518 弄",
+            },
+          ],
+          multipleSelection: [],
+        };
+      },
+      methods: {
+        isEqual(array1, array2) {
+          //判断两个obj数据是否相等
+          let keys = Object.keys(array1);
+          for (let j = 0; j < keys.length; j++) {
+            if (array1[keys[j]] !== array2[keys[j]]) {
+              return false;
+            }
+          }
+          return true;
+        },
+        removeElement(dataArray, element) {
+          /* 这种方法对于obj列表判断时会有问题
+          let index = dataArray.indexOf(element);
+          if (index === -1) {
+            return dataArray;
+          }
+          return dataArray.splice(index, 1);*/
+          let newArray = [];
+          for (let i = 0; i < dataArray.length; i++) {
+            if (this.isEqual(dataArray[i], element) === false) {
+              newArray.push(dataArray[i]);
+            }
+          }
+          return newArray;
+        },
+        singleSelect(rows, row) {
+          // 当触发单选事件时，判断该选项是否选中，如果选中，对选中的信息和非选中的信息进行保存或排除
+          let selected = rows.length && rows.indexOf(row) !== -1;
+          if (selected === true) {
+            this.selectedInfo.push(row);
+          } else {
+            this.selectedInfo = this.removeElement(this.selectedInfo, row);
+          }
+        },
+        selectAll(selection) {
+          // 监听全选按钮
+          let that = this;
+          that.tableData.forEach((item) => {
+            that.selectedInfo = that.removeElement(that.selectedInfo, item);
+          });
+          if (selection.length > 0) {
+            that.selectedInfo = that.selectedInfo.concat(that.tableData);
+          }
+        },
+        toggleSelection(rows) {
+          if (rows) {
+            rows.forEach((row) => {
+              this.$refs.multipleTable.toggleRowSelection(row);
+            });
+          } else {
+            this.$refs.multipleTable.clearSelection();
+          }
+        },
+        selectedData() {
+          let that = this;
+          for (let i = 0; i < that.selectedInfo.length; i++) {
+            for (let j = 0; j < that.tableData.length; j++)
+              if (
+                this.isEqual(that.selectedInfo[i], that.tableData[j]) === true
+              ) {
+                console.log("选中", that.selectedInfo[i]);
+                that.toggleSelection([that.tableData[j]]);
+                continue;
+              }
+          }
+        },
+        handleSelectionChange(val) {
+          this.multipleSelection = val;
+        },
+        handleCurrentChange(val) {
+          let that = this;
+          if (val == 1) {
+            that.tableData = that.tableData1;
+          } else if (val == 2) {
+            that.tableData = that.tableData2;
+          }
+          // 翻页后，将已经选中过的数据在页面上进行选中,这里需要等待一下才能选中成功，原因暂时不清楚
+          setTimeout(function () {
+            that.selectedData();
+          }, 500);
+        },
+      },
+      mounted() {
+        this.tableData = this.tableData1;
+      },
+    });
+  </script>
+</html>
