@@ -21,6 +21,9 @@ jobs:
       - name: Install GitBook CLI
         run: npm install -g gitbook-cli
 
+      - name: Install GitBook plugins
+        run: gitbook install
+
       - name: Build GitBook
         run: gitbook build
 
