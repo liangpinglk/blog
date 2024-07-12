@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>docker 容器之间相互访问 · GitBook</title>
+        <title>CPython build · GitBook</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.3">
@@ -66,6 +66,8 @@
 
     
     
+    <link rel="prev" href="apscheduler-use.html" />
+    
 
     </head>
     <body>
@@ -120,9 +122,9 @@
             <ul class="articles">
                 
     
-        <li class="chapter active" data-level="1.2.1" data-path="docker 容器之间相互访问.html">
+        <li class="chapter " data-level="1.2.1" data-path="../docker/docker 容器之间相互访问.html">
             
-                <a href="docker 容器之间相互访问.html">
+                <a href="../docker/docker 容器之间相互访问.html">
             
                     
                     docker 容器之间相互访问
@@ -216,9 +218,9 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="1.5.1" data-path="../python/apscheduler-use.html">
+        <li class="chapter " data-level="1.5.1" data-path="apscheduler-use.html">
             
-                <a href="../python/apscheduler-use.html">
+                <a href="apscheduler-use.html">
             
                     
                     apscheduler
@@ -229,9 +231,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.5.2" data-path="../python/cpython_build.html">
+        <li class="chapter active" data-level="1.5.2" data-path="cpython_build.html">
             
-                <a href="../python/cpython_build.html">
+                <a href="cpython_build.html">
             
                     
                     CPython build
@@ -277,7 +279,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >docker 容器之间相互访问</a>
+        <a href=".." >CPython build</a>
     </h1>
 </div>
 
@@ -292,20 +294,75 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h3 id="&#x5982;&#x679C;&#x4F7F;&#x7528;docker-compose">&#x5982;&#x679C;&#x4F7F;&#x7528;docker-compose</h3>
-<p>docker-compose &#x9ED8;&#x8BA4;&#x4F7F;&#x7528;&#x540C;&#x4E00;&#x4E2A;network&#xFF0C;&#x53EF;&#x4EE5;&#x76F4;&#x63A5;&#x901A;&#x8FC7;service name&#x8FDB;&#x884C;&#x76F8;&#x4E92;&#x8BBF;&#x95EE;</p>
-<h3 id="&#x901A;&#x8FC7;&#x66B4;&#x9732;&#x7AEF;&#x53E3;&#x5230;&#x5BBF;&#x4E3B;&#x673A;&#x8FDB;&#x884C;&#x8BBF;&#x95EE;">&#x901A;&#x8FC7;&#x66B4;&#x9732;&#x7AEF;&#x53E3;&#x5230;&#x5BBF;&#x4E3B;&#x673A;&#x8FDB;&#x884C;&#x8BBF;&#x95EE;</h3>
-<p>&#x5982;&#x679C;&#x670D;&#x52A1;&#x662F;&#x4E3A;&#x670D;&#x52A1;&#xFF0C;&#x4E0D;&#x9700;&#x8981;&#x5916;&#x90E8;&#x8BBF;&#x95EE;&#xFF0C;&#x4E0D;&#x5EFA;&#x8BAE;&#x8FD9;&#x6837;&#x505A;</p>
-<h3 id="&#x81EA;&#x5B9A;&#x4E49;network">&#x81EA;&#x5B9A;&#x4E49;network</h3>
+                                <h1 id="cpython-build">CPython build</h1>
+<h2 id="&#x7F16;&#x8BD1;">&#x7F16;&#x8BD1;</h2>
 <blockquote>
-<p>&#x670D;&#x52A1;&#x8DD1;&#x7684;&#x65F6;&#x5019;&#x6307;&#x5B9A;network,&#x7136;&#x540E;&#x901A;&#x8FC7;&#x5BB9;&#x5668;&#x540D;&#xFF0C;&#x5C31;&#x53EF;&#x4EE5;&#x76F8;&#x4E92;&#x8BBF;&#x95EE;&#x4E86;</p>
-<pre><code class="lang-shell">docker network create custom-local-net
-docker run --name ng1 --network custom-local-net  -d nginx
-docker run --name ng2 --network custom-local-net  -d nginx
-</code></pre>
-<p><img src="../picture/docker-network/image.png"></p>
+<p>&#x5728;&#x9879;&#x76EE;&#x76EE;&#x5F55;&#x4E0B;&#x6267;&#x884C;<code>python setup.py build_ext --inplace</code>&#x8FD9;&#x6837;&#x4F1A;&#x5728;py&#xFF08;pyc&#xFF09;&#x6587;&#x4EF6;&#x5BF9;&#x5E94;&#x7684;&#x8DEF;&#x5F84;&#x751F;&#x6210;&#x5BF9;&#x5E94;&#x7684;c&#x548C;.so &#x6587;&#x4EF6;
+```python
+from typing import Generator</p>
 </blockquote>
+<p>from setuptools import setup
+from Cython.Build import cythonize
+import os</p>
+<p>def find_all_file(file_path: str, target_ext: str = None) -&gt; Generator:
+    &quot;&quot;&quot;
+    &#x4F20;&#x5165;&#x6587;&#x4EF6;&#x8DEF;&#x5F84;&#x83B7;&#x53D6;&#x6240;&#x6709;&#x5B50;&#x6587;&#x4EF6;&#x8DEF;&#x5F84;
+    :param file_path:
+    :param target_ext:
+    :return:
+    &quot;&quot;&quot;
+    if os.path.isfile(file_path):
+        yield file_path
+    for root, ds, fs in os.walk(file_path):
+        for f in fs:
+            if not target_ext:
+                yield root + &apos;/&apos; + f if root else f
+            if target_ext and f.split(&apos;.&apos;)[-1].lower() == target_ext:
+                yield root + &apos;/&apos; + f if root else f</p>
+<h1 id="&#x6307;&#x5B9A;&#x8981;&#x7F16;&#x8BD1;&#x7684;&#x6E90;&#x6587;&#x4EF6;&#xFF0C;&#x5305;&#x62EC;&#x5B50;&#x76EE;&#x5F55;&#x4E2D;&#x7684;&#x6587;&#x4EF6;">&#x6307;&#x5B9A;&#x8981;&#x7F16;&#x8BD1;&#x7684;&#x6E90;&#x6587;&#x4EF6;&#xFF0C;&#x5305;&#x62EC;&#x5B50;&#x76EE;&#x5F55;&#x4E2D;&#x7684;&#x6587;&#x4EF6;</h1>
+<p>source_files = list(find_all_file(os.getcwd(), &apos;py&apos;))</p>
+<p>setup(
+    ext_modules=cythonize(source_files),
+)</p>
+<h1 id="python-setuppy-buildext---inplace">python setup.py build_ext --inplace</h1>
+<pre><code>
+## &#x6E05;&#x7406;&#x6587;&#x4EF6;
+&#x5728;&#x5B9E;&#x9645;&#x4EA4;&#x4ED8;&#x4E2D;&#xFF0C;&#x7F16;&#x8BD1;&#x597D;&#x540E;&#xFF0C;&#x9700;&#x8981;&#x5C06;&#x4E0D;&#x60F3;&#x5E72;&#x7684;&#x6587;&#x4EF6;&#x6E05;&#x7406;&#x6389;&#xFF0C;&#x6267;&#x884C;`python clear.py`
+```python
+import os
+import shutil
+from typing import Generator
 
+
+def find_all_file(file_path: str, target_ext: str = None) -&gt; Generator:
+    &quot;&quot;&quot;
+    &#x4F20;&#x5165;&#x6587;&#x4EF6;&#x8DEF;&#x5F84;&#x83B7;&#x53D6;&#x6240;&#x6709;&#x5B50;&#x6587;&#x4EF6;&#x8DEF;&#x5F84;
+    :param file_path:
+    :param target_ext:
+    :return:
+    &quot;&quot;&quot;
+    if os.path.isfile(file_path):
+        yield file_path
+    for root, ds, fs in os.walk(file_path):
+        for f in fs:
+            if not target_ext:
+                yield root + &apos;/&apos; + f if root else f
+            if target_ext and f.split(&apos;.&apos;)[-1].lower() == target_ext:
+                yield root + &apos;/&apos; + f if root else f
+
+
+def rm_file(all_file):
+    for i in all_file:
+        print(i)
+        if os.path.basename(i) not in [&quot;setup.py&quot;, &quot;clear.py&quot;]:
+            os.remove(i)
+
+
+rm_file(find_all_file(os.getcwd(), target_ext=&apos;py&apos;))
+rm_file(find_all_file(os.getcwd(), target_ext=&apos;c&apos;))
+# rm_file(find_all_file(os.getcwd(), target_ext=&apos;so&apos;))
+shutil.rmtree(&quot;build&quot;)
+</code></pre>
                                 
                                 </section>
                             
@@ -332,6 +389,10 @@ docker run --name ng2 --network custom-local-net  -d nginx
 
             
                 
+                <a href="apscheduler-use.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page: apscheduler">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
                 
             
         
@@ -340,7 +401,7 @@ docker run --name ng2 --network custom-local-net  -d nginx
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"docker 容器之间相互访问","level":"1.2.1","depth":2,"next":{"title":"linux","level":"1.3","depth":1,"ref":"","articles":[{"title":"crontab-timing-task","level":"1.3.1","depth":2,"path":"linux/crontab-timing-task.md","ref":"linux/crontab-timing-task.md","articles":[]}]},"previous":{"title":"Docker","level":"1.2","depth":1,"ref":"","articles":[{"title":"docker 容器之间相互访问","level":"1.2.1","depth":2,"path":"docker/docker 容器之间相互访问.md","ref":"docker/docker 容器之间相互访问.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["intopic-toc","expandable-chapters"],"pluginsConfig":{"intopic-toc":{"isCollapsed":true,"isScrollspyActive":true,"label":"In this article","maxDepth":6,"mode":"nested","selector":".markdown-section h1, .markdown-section h2, .markdown-section h3, .markdown-section h4, .markdown-section h5, .markdown-section h6","visible":true},"expandable-chapters":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"docker/docker 容器之间相互访问.md","mtime":"2024-07-12T03:56:14.756Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2024-07-12T03:57:01.035Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"CPython build","level":"1.5.2","depth":2,"previous":{"title":"apscheduler","level":"1.5.1","depth":2,"path":"python/apscheduler-use.md","ref":"python/apscheduler-use.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["intopic-toc","expandable-chapters"],"pluginsConfig":{"intopic-toc":{"isCollapsed":true,"isScrollspyActive":true,"label":"In this article","maxDepth":6,"mode":"nested","selector":".markdown-section h1, .markdown-section h2, .markdown-section h3, .markdown-section h4, .markdown-section h5, .markdown-section h6","visible":true},"expandable-chapters":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"python/cpython_build.md","mtime":"2024-07-12T03:56:14.796Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2024-07-12T03:57:01.035Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>

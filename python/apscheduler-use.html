@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>docker 容器之间相互访问 · GitBook</title>
+        <title>apscheduler · GitBook</title>
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="description" content="">
         <meta name="generator" content="GitBook 3.2.3">
@@ -65,6 +65,8 @@
     <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
 
     
+    <link rel="next" href="cpython_build.html" />
+    
     
 
     </head>
@@ -120,9 +122,9 @@
             <ul class="articles">
                 
     
-        <li class="chapter active" data-level="1.2.1" data-path="docker 容器之间相互访问.html">
+        <li class="chapter " data-level="1.2.1" data-path="../docker/docker 容器之间相互访问.html">
             
-                <a href="docker 容器之间相互访问.html">
+                <a href="../docker/docker 容器之间相互访问.html">
             
                     
                     docker 容器之间相互访问
@@ -216,9 +218,9 @@
             <ul class="articles">
                 
     
-        <li class="chapter " data-level="1.5.1" data-path="../python/apscheduler-use.html">
+        <li class="chapter active" data-level="1.5.1" data-path="apscheduler-use.html">
             
-                <a href="../python/apscheduler-use.html">
+                <a href="apscheduler-use.html">
             
                     
                     apscheduler
@@ -229,9 +231,9 @@
             
         </li>
     
-        <li class="chapter " data-level="1.5.2" data-path="../python/cpython_build.html">
+        <li class="chapter " data-level="1.5.2" data-path="cpython_build.html">
             
-                <a href="../python/cpython_build.html">
+                <a href="cpython_build.html">
             
                     
                     CPython build
@@ -277,7 +279,7 @@
     <!-- Title -->
     <h1>
         <i class="fa fa-circle-o-notch fa-spin"></i>
-        <a href=".." >docker 容器之间相互访问</a>
+        <a href=".." >apscheduler</a>
     </h1>
 </div>
 
@@ -292,19 +294,52 @@
     
                                 <section class="normal markdown-section">
                                 
-                                <h3 id="&#x5982;&#x679C;&#x4F7F;&#x7528;docker-compose">&#x5982;&#x679C;&#x4F7F;&#x7528;docker-compose</h3>
-<p>docker-compose &#x9ED8;&#x8BA4;&#x4F7F;&#x7528;&#x540C;&#x4E00;&#x4E2A;network&#xFF0C;&#x53EF;&#x4EE5;&#x76F4;&#x63A5;&#x901A;&#x8FC7;service name&#x8FDB;&#x884C;&#x76F8;&#x4E92;&#x8BBF;&#x95EE;</p>
-<h3 id="&#x901A;&#x8FC7;&#x66B4;&#x9732;&#x7AEF;&#x53E3;&#x5230;&#x5BBF;&#x4E3B;&#x673A;&#x8FDB;&#x884C;&#x8BBF;&#x95EE;">&#x901A;&#x8FC7;&#x66B4;&#x9732;&#x7AEF;&#x53E3;&#x5230;&#x5BBF;&#x4E3B;&#x673A;&#x8FDB;&#x884C;&#x8BBF;&#x95EE;</h3>
-<p>&#x5982;&#x679C;&#x670D;&#x52A1;&#x662F;&#x4E3A;&#x670D;&#x52A1;&#xFF0C;&#x4E0D;&#x9700;&#x8981;&#x5916;&#x90E8;&#x8BBF;&#x95EE;&#xFF0C;&#x4E0D;&#x5EFA;&#x8BAE;&#x8FD9;&#x6837;&#x505A;</p>
-<h3 id="&#x81EA;&#x5B9A;&#x4E49;network">&#x81EA;&#x5B9A;&#x4E49;network</h3>
-<blockquote>
-<p>&#x670D;&#x52A1;&#x8DD1;&#x7684;&#x65F6;&#x5019;&#x6307;&#x5B9A;network,&#x7136;&#x540E;&#x901A;&#x8FC7;&#x5BB9;&#x5668;&#x540D;&#xFF0C;&#x5C31;&#x53EF;&#x4EE5;&#x76F8;&#x4E92;&#x8BBF;&#x95EE;&#x4E86;</p>
-<pre><code class="lang-shell">docker network create custom-local-net
-docker run --name ng1 --network custom-local-net  -d nginx
-docker run --name ng2 --network custom-local-net  -d nginx
+                                <p><a href="https://apscheduler.readthedocs.io/" target="_blank">apscheduler</a><br>Advanced Python Scheduler (APScheduler) is a task scheduler and task queue system for Python. It can be used solely as a job queuing system if you have no need for task scheduling&#x3002;</p>
+<h2 id="demo">demo</h2>
+<pre><code class="lang-python"><span class="hljs-keyword">import</span> time
+<span class="hljs-keyword">from</span> datetime <span class="hljs-keyword">import</span> datetime
+
+<span class="hljs-keyword">from</span> pytz <span class="hljs-keyword">import</span> utc
+
+<span class="hljs-keyword">from</span> apscheduler.schedulers.background <span class="hljs-keyword">import</span> BackgroundScheduler
+<span class="hljs-keyword">from</span> apscheduler.jobstores.mongodb <span class="hljs-keyword">import</span> MongoDBJobStore
+<span class="hljs-keyword">from</span> apscheduler.jobstores.sqlalchemy <span class="hljs-keyword">import</span> SQLAlchemyJobStore
+<span class="hljs-keyword">from</span> apscheduler.executors.pool <span class="hljs-keyword">import</span> ThreadPoolExecutor, ProcessPoolExecutor
+
+jobstores = {
+    <span class="hljs-comment"># &apos;mongo&apos;: MongoDBJobStore(),</span>
+    <span class="hljs-string">&apos;default&apos;</span>: SQLAlchemyJobStore(url=<span class="hljs-string">&apos;sqlite:///jobs.sqlite&apos;</span>)
+}
+executors = {
+    <span class="hljs-string">&apos;default&apos;</span>: ThreadPoolExecutor(<span class="hljs-number">20</span>),
+    <span class="hljs-string">&apos;processpool&apos;</span>: ProcessPoolExecutor(<span class="hljs-number">5</span>)
+}
+job_defaults = {
+    <span class="hljs-string">&apos;coalesce&apos;</span>: <span class="hljs-keyword">False</span>,
+    <span class="hljs-string">&apos;max_instances&apos;</span>: <span class="hljs-number">3</span>
+}
+scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors, job_defaults=job_defaults, timezone=utc)
+
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">tick</span><span class="hljs-params">()</span>:</span>
+    print(<span class="hljs-string">&apos;Tick! The time is: %s&apos;</span> % datetime.now())
+
+
+<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&apos;__main__&apos;</span>:
+    <span class="hljs-comment"># id,&#x53EF;&#x4EE5;&#x6307;&#x5B9A;&#xFF0C;&#x4E0D;&#x6307;&#x5B9A;&#x4F1A;&#x9ED8;&#x8BA4;&#x751F;&#x6210;&#xFF0C;</span>
+    <span class="hljs-comment"># replace_existing, &#x5141;&#x8BB8;&#x66FF;&#x6362;&#x5DF2;&#x5B58;&#x5728;&#x7684;&#x4EFB;&#x52A1;</span>
+    <span class="hljs-comment"># &#x5176;&#x4ED6;&#x53C2;&#x6570;&#xFF0C;&#x67E5;&#x770B;add_job &#x6E90;&#x7801;</span>
+    scheduler.add_job(tick, <span class="hljs-string">&apos;interval&apos;</span>, seconds=<span class="hljs-number">3</span>, replace_existing=<span class="hljs-keyword">True</span>, id=<span class="hljs-string">&apos;abc&apos;</span>)
+    scheduler.start()
+    <span class="hljs-comment"># &#x7A0B;&#x5E8F;&#x4E00;&#x76F4;&#x4FDD;&#x6301;&#x8FD0;&#x884C;&#xFF0C;&#x540E;&#x7EED;&#x7684;&#x4EFB;&#x52A1;&#x624D;&#x4F1A;&#x88AB;&#x6267;&#x884C;</span>
+    <span class="hljs-keyword">while</span> <span class="hljs-keyword">True</span>:
+        time.sleep(<span class="hljs-number">1</span>)
+    print(<span class="hljs-string">&apos;done&apos;</span>)
 </code></pre>
-<p><img src="../picture/docker-network/image.png"></p>
-</blockquote>
+<h2 id="&#x5206;&#x5E03;&#x5F0F;&#x652F;&#x6301;&#xFF1F;">&#x5206;&#x5E03;&#x5F0F;&#x652F;&#x6301;&#xFF1F;</h2>
+<p>&#x4E0D;&#x652F;&#x6301;&#x5206;&#x5E03;&#x5F0F;&#xFF0C;&#x4EFB;&#x52A1;&#x4F1A;&#x88AB;&#x91CD;&#x590D;&#x6267;&#x884C;&#xFF0C;&#x8FD9;&#x4E2A;&#x8981;&#x6839;&#x636E;&#x5B9E;&#x9645;&#x573A;&#x666F;&#x786E;&#x5B9A;&#x662F;&#x5426;&#x4F7F;&#x7528;&#x3002;&#x8FD9;&#x662F;&#x6211;&#x4E00;&#x4E2A;&#x670B;&#x53CB;&#x5728;&#x7528;&#x7684;&#xFF0C;&#x6211;&#x7B80;&#x5355;&#x4E86;&#x89E3;&#x4E86;&#x4E0B;&#xFF0C;&#x6211;&#x670B;&#x53CB;&#x662F;&#x7528;&#x5B83;&#x6765;&#x505A;&#x5B9A;&#x65F6;&#x4EFB;&#x52A1;&#x7684;&#x3002;
+&#x901A;&#x8FC7;&#x542F;&#x52A8;&#x4E24;&#x4E2A;&#x7A0B;&#x5E8F;&#x7ED3;&#x679C;&#xFF1A;
+<a href="https://imgse.com/i/pipMw7Q" target="_blank"><img src="https://z1.ax1x.com/2023/10/13/pipMw7Q.png" alt="pipMw7Q.png"></a></p>
 
                                 
                                 </section>
@@ -333,6 +368,10 @@ docker run --name ng2 --network custom-local-net  -d nginx
             
                 
                 
+                <a href="cpython_build.html" class="navigation navigation-next navigation-unique" aria-label="Next page: CPython build">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
             
         
     </div>
@@ -340,7 +379,7 @@ docker run --name ng2 --network custom-local-net  -d nginx
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"docker 容器之间相互访问","level":"1.2.1","depth":2,"next":{"title":"linux","level":"1.3","depth":1,"ref":"","articles":[{"title":"crontab-timing-task","level":"1.3.1","depth":2,"path":"linux/crontab-timing-task.md","ref":"linux/crontab-timing-task.md","articles":[]}]},"previous":{"title":"Docker","level":"1.2","depth":1,"ref":"","articles":[{"title":"docker 容器之间相互访问","level":"1.2.1","depth":2,"path":"docker/docker 容器之间相互访问.md","ref":"docker/docker 容器之间相互访问.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["intopic-toc","expandable-chapters"],"pluginsConfig":{"intopic-toc":{"isCollapsed":true,"isScrollspyActive":true,"label":"In this article","maxDepth":6,"mode":"nested","selector":".markdown-section h1, .markdown-section h2, .markdown-section h3, .markdown-section h4, .markdown-section h5, .markdown-section h6","visible":true},"expandable-chapters":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"docker/docker 容器之间相互访问.md","mtime":"2024-07-12T03:56:14.756Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2024-07-12T03:57:01.035Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"apscheduler","level":"1.5.1","depth":2,"next":{"title":"CPython build","level":"1.5.2","depth":2,"path":"python/cpython_build.md","ref":"python/cpython_build.md","articles":[]},"previous":{"title":"python","level":"1.5","depth":1,"ref":"","articles":[{"title":"apscheduler","level":"1.5.1","depth":2,"path":"python/apscheduler-use.md","ref":"python/apscheduler-use.md","articles":[]},{"title":"CPython build","level":"1.5.2","depth":2,"path":"python/cpython_build.md","ref":"python/cpython_build.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["intopic-toc","expandable-chapters"],"pluginsConfig":{"intopic-toc":{"isCollapsed":true,"isScrollspyActive":true,"label":"In this article","maxDepth":6,"mode":"nested","selector":".markdown-section h1, .markdown-section h2, .markdown-section h3, .markdown-section h4, .markdown-section h5, .markdown-section h6","visible":true},"expandable-chapters":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"python/apscheduler-use.md","mtime":"2024-07-12T03:56:14.796Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2024-07-12T03:57:01.035Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
