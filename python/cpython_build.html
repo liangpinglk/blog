@@ -295,74 +295,81 @@
                                 <section class="normal markdown-section">
                                 
                                 <h1 id="cpython-build">CPython build</h1>
+<pre><code class="lang-shell">pip install cython
+</code></pre>
 <h2 id="&#x7F16;&#x8BD1;">&#x7F16;&#x8BD1;</h2>
 <blockquote>
-<p>&#x5728;&#x9879;&#x76EE;&#x76EE;&#x5F55;&#x4E0B;&#x6267;&#x884C;<code>python setup.py build_ext --inplace</code>&#x8FD9;&#x6837;&#x4F1A;&#x5728;py&#xFF08;pyc&#xFF09;&#x6587;&#x4EF6;&#x5BF9;&#x5E94;&#x7684;&#x8DEF;&#x5F84;&#x751F;&#x6210;&#x5BF9;&#x5E94;&#x7684;c&#x548C;.so &#x6587;&#x4EF6;
-```python
-from typing import Generator</p>
+<p>&#x5728;&#x9879;&#x76EE;&#x76EE;&#x5F55;&#x4E0B;&#x6267;&#x884C;<code>python setup.py build_ext --inplace</code>&#x8FD9;&#x6837;&#x4F1A;&#x5728;py&#xFF08;pyc&#xFF09;&#x6587;&#x4EF6;&#x5BF9;&#x5E94;&#x7684;&#x8DEF;&#x5F84;&#x751F;&#x6210;&#x5BF9;&#x5E94;&#x7684;c&#x548C;.so &#x6587;&#x4EF6;</p>
 </blockquote>
-<p>from setuptools import setup
-from Cython.Build import cythonize
-import os</p>
-<p>def find_all_file(file_path: str, target_ext: str = None) -&gt; Generator:
-    &quot;&quot;&quot;
+<pre><code class="lang-python"><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Generator
+
+<span class="hljs-keyword">from</span> setuptools <span class="hljs-keyword">import</span> setup
+<span class="hljs-keyword">from</span> Cython.Build <span class="hljs-keyword">import</span> cythonize
+<span class="hljs-keyword">import</span> os
+
+
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">find_all_file</span><span class="hljs-params">(file_path: str, target_ext: str = None)</span> -&gt; Generator:</span>
+    <span class="hljs-string">&quot;&quot;&quot;
     &#x4F20;&#x5165;&#x6587;&#x4EF6;&#x8DEF;&#x5F84;&#x83B7;&#x53D6;&#x6240;&#x6709;&#x5B50;&#x6587;&#x4EF6;&#x8DEF;&#x5F84;
     :param file_path:
     :param target_ext:
     :return:
-    &quot;&quot;&quot;
-    if os.path.isfile(file_path):
-        yield file_path
-    for root, ds, fs in os.walk(file_path):
-        for f in fs:
-            if not target_ext:
-                yield root + &apos;/&apos; + f if root else f
-            if target_ext and f.split(&apos;.&apos;)[-1].lower() == target_ext:
-                yield root + &apos;/&apos; + f if root else f</p>
-<h1 id="&#x6307;&#x5B9A;&#x8981;&#x7F16;&#x8BD1;&#x7684;&#x6E90;&#x6587;&#x4EF6;&#xFF0C;&#x5305;&#x62EC;&#x5B50;&#x76EE;&#x5F55;&#x4E2D;&#x7684;&#x6587;&#x4EF6;">&#x6307;&#x5B9A;&#x8981;&#x7F16;&#x8BD1;&#x7684;&#x6E90;&#x6587;&#x4EF6;&#xFF0C;&#x5305;&#x62EC;&#x5B50;&#x76EE;&#x5F55;&#x4E2D;&#x7684;&#x6587;&#x4EF6;</h1>
-<p>source_files = list(find_all_file(os.getcwd(), &apos;py&apos;))</p>
-<p>setup(
+    &quot;&quot;&quot;</span>
+    <span class="hljs-keyword">if</span> os.path.isfile(file_path):
+        <span class="hljs-keyword">yield</span> file_path
+    <span class="hljs-keyword">for</span> root, ds, fs <span class="hljs-keyword">in</span> os.walk(file_path):
+        <span class="hljs-keyword">for</span> f <span class="hljs-keyword">in</span> fs:
+            <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> target_ext:
+                <span class="hljs-keyword">yield</span> root + <span class="hljs-string">&apos;/&apos;</span> + f <span class="hljs-keyword">if</span> root <span class="hljs-keyword">else</span> f
+            <span class="hljs-keyword">if</span> target_ext <span class="hljs-keyword">and</span> f.split(<span class="hljs-string">&apos;.&apos;</span>)[<span class="hljs-number">-1</span>].lower() == target_ext:
+                <span class="hljs-keyword">yield</span> root + <span class="hljs-string">&apos;/&apos;</span> + f <span class="hljs-keyword">if</span> root <span class="hljs-keyword">else</span> f
+
+
+<span class="hljs-comment"># &#x6307;&#x5B9A;&#x8981;&#x7F16;&#x8BD1;&#x7684;&#x6E90;&#x6587;&#x4EF6;&#xFF0C;&#x5305;&#x62EC;&#x5B50;&#x76EE;&#x5F55;&#x4E2D;&#x7684;&#x6587;&#x4EF6;</span>
+source_files = list(find_all_file(os.getcwd(), <span class="hljs-string">&apos;py&apos;</span>))
+
+setup(
     ext_modules=cythonize(source_files),
-)</p>
-<h1 id="python-setuppy-buildext---inplace">python setup.py build_ext --inplace</h1>
-<pre><code>
-## &#x6E05;&#x7406;&#x6587;&#x4EF6;
-&#x5728;&#x5B9E;&#x9645;&#x4EA4;&#x4ED8;&#x4E2D;&#xFF0C;&#x7F16;&#x8BD1;&#x597D;&#x540E;&#xFF0C;&#x9700;&#x8981;&#x5C06;&#x4E0D;&#x60F3;&#x5E72;&#x7684;&#x6587;&#x4EF6;&#x6E05;&#x7406;&#x6389;&#xFF0C;&#x6267;&#x884C;`python clear.py`
-```python
-import os
-import shutil
-from typing import Generator
+)
+<span class="hljs-comment"># python setup.py build_ext --inplace</span>
+</code></pre>
+<h2 id="&#x6E05;&#x7406;&#x6587;&#x4EF6;">&#x6E05;&#x7406;&#x6587;&#x4EF6;</h2>
+<p>&#x5728;&#x5B9E;&#x9645;&#x4EA4;&#x4ED8;&#x4E2D;&#xFF0C;&#x7F16;&#x8BD1;&#x597D;&#x540E;&#xFF0C;&#x9700;&#x8981;&#x5C06;&#x4E0D;&#x60F3;&#x5E72;&#x7684;&#x6587;&#x4EF6;&#x6E05;&#x7406;&#x6389;&#xFF0C;&#x6267;&#x884C;<code>python clear.py</code></p>
+<pre><code class="lang-python"><span class="hljs-keyword">import</span> os
+<span class="hljs-keyword">import</span> shutil
+<span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> Generator
 
 
-def find_all_file(file_path: str, target_ext: str = None) -&gt; Generator:
-    &quot;&quot;&quot;
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">find_all_file</span><span class="hljs-params">(file_path: str, target_ext: str = None)</span> -&gt; Generator:</span>
+    <span class="hljs-string">&quot;&quot;&quot;
     &#x4F20;&#x5165;&#x6587;&#x4EF6;&#x8DEF;&#x5F84;&#x83B7;&#x53D6;&#x6240;&#x6709;&#x5B50;&#x6587;&#x4EF6;&#x8DEF;&#x5F84;
     :param file_path:
     :param target_ext:
     :return:
-    &quot;&quot;&quot;
-    if os.path.isfile(file_path):
-        yield file_path
-    for root, ds, fs in os.walk(file_path):
-        for f in fs:
-            if not target_ext:
-                yield root + &apos;/&apos; + f if root else f
-            if target_ext and f.split(&apos;.&apos;)[-1].lower() == target_ext:
-                yield root + &apos;/&apos; + f if root else f
+    &quot;&quot;&quot;</span>
+    <span class="hljs-keyword">if</span> os.path.isfile(file_path):
+        <span class="hljs-keyword">yield</span> file_path
+    <span class="hljs-keyword">for</span> root, ds, fs <span class="hljs-keyword">in</span> os.walk(file_path):
+        <span class="hljs-keyword">for</span> f <span class="hljs-keyword">in</span> fs:
+            <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> target_ext:
+                <span class="hljs-keyword">yield</span> root + <span class="hljs-string">&apos;/&apos;</span> + f <span class="hljs-keyword">if</span> root <span class="hljs-keyword">else</span> f
+            <span class="hljs-keyword">if</span> target_ext <span class="hljs-keyword">and</span> f.split(<span class="hljs-string">&apos;.&apos;</span>)[<span class="hljs-number">-1</span>].lower() == target_ext:
+                <span class="hljs-keyword">yield</span> root + <span class="hljs-string">&apos;/&apos;</span> + f <span class="hljs-keyword">if</span> root <span class="hljs-keyword">else</span> f
 
 
-def rm_file(all_file):
-    for i in all_file:
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">rm_file</span><span class="hljs-params">(all_file)</span>:</span>
+    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> all_file:
         print(i)
-        if os.path.basename(i) not in [&quot;setup.py&quot;, &quot;clear.py&quot;]:
+        <span class="hljs-keyword">if</span> os.path.basename(i) <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> [<span class="hljs-string">&quot;setup.py&quot;</span>, <span class="hljs-string">&quot;clear.py&quot;</span>]:
             os.remove(i)
 
 
-rm_file(find_all_file(os.getcwd(), target_ext=&apos;py&apos;))
-rm_file(find_all_file(os.getcwd(), target_ext=&apos;c&apos;))
-# rm_file(find_all_file(os.getcwd(), target_ext=&apos;so&apos;))
-shutil.rmtree(&quot;build&quot;)
+rm_file(find_all_file(os.getcwd(), target_ext=<span class="hljs-string">&apos;py&apos;</span>))
+rm_file(find_all_file(os.getcwd(), target_ext=<span class="hljs-string">&apos;c&apos;</span>))
+<span class="hljs-comment"># rm_file(find_all_file(os.getcwd(), target_ext=&apos;so&apos;))</span>
+shutil.rmtree(<span class="hljs-string">&quot;build&quot;</span>)
 </code></pre>
+
                                 
                                 </section>
                             
@@ -401,7 +408,7 @@ shutil.rmtree(&quot;build&quot;)
     <script>
         var gitbook = gitbook || [];
         gitbook.push(function() {
-            gitbook.page.hasChanged({"page":{"title":"CPython build","level":"1.5.2","depth":2,"previous":{"title":"apscheduler","level":"1.5.1","depth":2,"path":"python/apscheduler-use.md","ref":"python/apscheduler-use.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["intopic-toc","expandable-chapters"],"pluginsConfig":{"intopic-toc":{"isCollapsed":true,"isScrollspyActive":true,"label":"In this article","maxDepth":6,"mode":"nested","selector":".markdown-section h1, .markdown-section h2, .markdown-section h3, .markdown-section h4, .markdown-section h5, .markdown-section h6","visible":true},"expandable-chapters":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"python/cpython_build.md","mtime":"2024-07-12T03:56:14.796Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2024-07-12T03:57:01.035Z"},"basePath":"..","book":{"language":""}});
+            gitbook.page.hasChanged({"page":{"title":"CPython build","level":"1.5.2","depth":2,"previous":{"title":"apscheduler","level":"1.5.1","depth":2,"path":"python/apscheduler-use.md","ref":"python/apscheduler-use.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"*","theme":"default","variables":{},"plugins":["intopic-toc","expandable-chapters"],"pluginsConfig":{"intopic-toc":{"isCollapsed":true,"isScrollspyActive":true,"label":"In this article","maxDepth":6,"mode":"nested","selector":".markdown-section h1, .markdown-section h2, .markdown-section h3, .markdown-section h4, .markdown-section h5, .markdown-section h6","visible":true},"expandable-chapters":{},"highlight":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"python/cpython_build.md","mtime":"2024-07-12T05:23:51.673Z","type":"markdown"},"gitbook":{"version":"3.2.3","time":"2024-07-12T05:24:36.895Z"},"basePath":"..","book":{"language":""}});
         });
     </script>
 </div>
